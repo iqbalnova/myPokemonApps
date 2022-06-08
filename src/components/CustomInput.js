@@ -10,6 +10,8 @@ export default function CustomInput({
   securePass,
   fieldButtonFunction,
   onChange,
+  value,
+  onBlur,
 }) {
   return (
     <View
@@ -28,12 +30,16 @@ export default function CustomInput({
           style={{flex: 1, paddingVertical: 0}}
           secureTextEntry={securePass}
           onChangeText={onChange}
+          value={value}
+          onBlur={onBlur}
         />
       ) : (
         <TextInput
           placeholder={label}
           keyboardType={keyboardType}
           onChangeText={onChange}
+          value={value}
+          onBlur={onBlur}
           style={{flex: 1, paddingVertical: 0}}
         />
       )}

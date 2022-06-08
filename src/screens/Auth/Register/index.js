@@ -23,7 +23,7 @@ import ImageCropPicker from 'react-native-image-crop-picker';
 // Kebutuhan firebase
 import authProvider from '@react-native-firebase/auth';
 import messagingProvider from '@react-native-firebase/messaging';
-// import {myDb} from '../../helpers/DB';
+import {myDb} from '../../../helpers/DB';
 import storage from '@react-native-firebase/storage';
 
 const auth = authProvider();
