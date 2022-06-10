@@ -76,7 +76,7 @@ export default function Login({navigation}) {
           const results = await myDb.ref(`users/${res.user.uid}`).once('value');
           if (results.val()) {
             // dispatch(setUser(results.val()));
-            navigation.navigate('Dashboard');
+            navigation.navigate('Main');
           }
         }
       }
