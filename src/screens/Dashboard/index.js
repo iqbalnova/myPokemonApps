@@ -1,4 +1,11 @@
-import {View, Alert, Text, FlatList, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Alert,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import axios from 'axios';
 import {baseUrl} from '../../helpers/API';
@@ -18,6 +25,14 @@ export default function Dashboard({navigation}) {
   useEffect(() => {
     getPokemonData();
   }, [currentOffset]);
+
+  const [refresh, setRefresh] = useState(false);
+
+  const onRefresh = () => {
+    setRefresh(true);
+    getPokemonData();
+    setRefresh(false);
+  };
 
   const getPokemonData = async () => {
     try {
@@ -150,6 +165,9 @@ export default function Dashboard({navigation}) {
   return (
     <View style={{flex: 1}}>
       <FlatList
+        refreshControl={
+          <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
+        }
         numColumns={2}
         data={pokemon}
         renderItem={renderItem}

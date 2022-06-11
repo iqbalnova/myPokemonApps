@@ -5,14 +5,19 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import {baseUrl} from '../../helpers/API';
+import {myDb} from '../../helpers/DB';
+import {useSelector} from 'react-redux';
 
 const DetailPokemon = ({navigation, route}) => {
   const {pokeName} = route.params;
+  const {_user} = useSelector(state => state.login);
+
   const [dataPokemon, setDataPokemon] = useState({
     name: '',
     photo: 'belum',
@@ -25,6 +30,7 @@ const DetailPokemon = ({navigation, route}) => {
 
   useEffect(() => {
     getDataPoke();
+    getPokeBag();
   }, []);
 
   const handleDataPokemon = (field, value) => {
@@ -62,6 +68,45 @@ const DetailPokemon = ({navigation, route}) => {
     }
   };
 
+  const [catchs, setCatchs] = useState({name: []});
+  const [isTrue, setIsTrue] = useState(false);
+
+  const getPokeBag = async () => {
+    const res = await myDb.ref(`pokeBag/${_user._id}/`).once('value');
+
+    console.log('RES POKEBAG: ', res.val());
+    setCatchs(res.val().name);
+  };
+
+  const randomGenerator = useCallback(
+    async value => {
+      let random = Math.floor(Math.random() * 3);
+      if (value === random) {
+        setIsTrue(true);
+        try {
+          await myDb.ref(`pokeBag/${_user._id}`).update({
+            name: [...catchs, pokeName],
+          });
+          Alert.alert('Horee', 'Anda mendapatkan pokemon', [
+            {
+              text: 'Lihat Bag',
+              onPress: () => {
+                navigation.navigate('PokeBag');
+              },
+            },
+            {text: 'OK', onPress: () => console.log('OK Pressed!')},
+          ]);
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        setIsTrue(false);
+        Alert.alert('Yahhh', 'Anda belum beruntung');
+      }
+    },
+    [catchs],
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.topNav}>
@@ -69,7 +114,9 @@ const DetailPokemon = ({navigation, route}) => {
           <Ionicons name="chevron-back-sharp" size={32} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.txtTitle}>Pokemon Detail</Text>
-        <TouchableOpacity style={styles.btnCatch}>
+        <TouchableOpacity
+          onPress={() => randomGenerator(Math.floor(Math.random() * 3))}
+          style={styles.btnCatch}>
           <Text style={{color: '#fff', paddingHorizontal: 4}}>Catch</Text>
         </TouchableOpacity>
       </View>
