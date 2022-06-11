@@ -1,14 +1,19 @@
-import {View, Text, FlatList, TouchableOpacity} from 'react-native';
+import {View, Alert, Text, FlatList, TouchableOpacity} from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import axios from 'axios';
 import {baseUrl} from '../../helpers/API';
 import CardPokemon from '../../components/CardPokemon';
+import Feather from 'react-native-vector-icons/Feather';
+import auth from '@react-native-firebase/auth';
+import {useDispatch} from 'react-redux';
+import {setUser} from '../Auth/Login/redux/action';
 
-export default function Dashboard() {
+export default function Dashboard({navigation}) {
   const [pokemon, setPokemon] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentOffset, setCurrentOffset] = useState(0);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     getPokemonData();
@@ -21,6 +26,7 @@ export default function Dashboard() {
         `${baseUrl}/pokemon?offset=${currentOffset}&limit=18`,
       );
       setPokemon([...res.data.results]);
+      console.log('DATA :', res.data.results);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -41,11 +47,35 @@ export default function Dashboard() {
     }
   }, [currentOffset, currentPage]);
 
-  const renderItem = ({item}) => <CardPokemon name={item.name} />;
+  const renderItem = ({item}) => (
+    <CardPokemon
+      onPress={() => navigation.navigate('Detail', {pokeName: item.name})}
+      name={item.name}
+    />
+  );
+
+  const signOut = async () => {
+    try {
+      await auth()
+        .signOut()
+        .then(() => {
+          navigation.navigate('Login');
+          console.log('out');
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const renderHeader = () => {
     return (
-      <View>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginRight: 20,
+        }}>
         <Text
           style={{
             fontSize: 26,
@@ -56,6 +86,26 @@ export default function Dashboard() {
           }}>
           PokeDex
         </Text>
+        <TouchableOpacity
+          onPress={() =>
+            Alert.alert('Logout', 'Apakah anda yakin untuk logout ?', [
+              {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
+              {
+                text: 'OK',
+                onPress: () => {
+                  let isOut = true;
+                  dispatch(setUser({}));
+
+                  isOut = false;
+                  if (!isOut) {
+                    signOut();
+                  }
+                },
+              },
+            ])
+          }>
+          <Feather name="log-out" size={26} color="red" />
+        </TouchableOpacity>
       </View>
     );
   };

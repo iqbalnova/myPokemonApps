@@ -2,10 +2,10 @@ import {View, StyleSheet, Text, Image, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {pokeball} from '../assets/images';
 
-export default function CardPokemon({name}) {
+export default function CardPokemon({name, onPress}) {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.btn}>
+      <TouchableOpacity onPress={onPress} style={styles.btn}>
         <Image source={pokeball} style={{width: 30, height: 30}} />
         <Text style={styles.txt}>{name}</Text>
       </TouchableOpacity>

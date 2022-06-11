@@ -26,7 +26,8 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 
 // Redux
-// import {useDispatch} from 'react-redux';
+import {useDispatch} from 'react-redux';
+import {setUser} from './redux/action';
 // import {setUser} from './redux/action';
 
 const auth = authProvider();
@@ -38,7 +39,7 @@ export default function Login({navigation}) {
 
   const [loading, setLoading] = useState(false);
 
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   // For validation inputan kosong
   const validationSignUp = Yup.object().shape({
@@ -75,7 +76,7 @@ export default function Login({navigation}) {
         if (isUpdate) {
           const results = await myDb.ref(`users/${res.user.uid}`).once('value');
           if (results.val()) {
-            // dispatch(setUser(results.val()));
+            dispatch(setUser(results.val()));
             navigation.navigate('Main');
           }
         }
